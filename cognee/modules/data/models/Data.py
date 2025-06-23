@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from enum import Enum
 from uuid import uuid4
 from sqlalchemy import UUID, Column, DateTime, String, JSON, Integer
 from sqlalchemy.orm import relationship
@@ -7,6 +8,12 @@ from cognee.infrastructure.databases.relational import Base
 
 from .DatasetData import DatasetData
 
+
+class FileProcessingStatus(Enum):
+    ERROR = "ERROR"
+    PROCESSED = "PROCESSED"
+    PROCESSING = "PROCESSING"
+    UNPROCESSED = "UNPROCESSED"
 
 class Data(Base):
     __tablename__ = "data"
@@ -24,6 +31,12 @@ class Data(Base):
     token_count = Column(Integer)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime(timezone=True), onupdate=lambda: datetime.now(timezone.utc))
+    processing_status = Column(
+        Enum(FileProcessingStatus),
+        default=FileProcessingStatus.UNPROCESSED,
+        server_default='UNPROCESSED',
+        index=True
+    )
 
     datasets = relationship(
         "Dataset",
@@ -43,5 +56,6 @@ class Data(Base):
             "createdAt": self.created_at.isoformat(),
             "updatedAt": self.updated_at.isoformat() if self.updated_at else None,
             "nodeSet": self.node_set,
+            "processing_status": self.processing_status,
             # "datasets": [dataset.to_json() for dataset in self.datasets]
         }
