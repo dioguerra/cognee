@@ -105,6 +105,12 @@ pip install cognee
 You can install the local Cognee repo using **pip**, **poetry** and **uv**.
 For local pip installation please make sure your pip version is above version 21.3.
 
+Required dependencies:
+```bash
+# requires postgresql-devel
+apt install libpq-dev
+```
+
 ### with UV with all optional dependencies
 
 ```bash
